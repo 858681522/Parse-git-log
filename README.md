@@ -1,4 +1,4 @@
-# Parse-git-log
+# Parse-git-log-into-dataset
 Aim: parse git log into structured datasets and json files.
 
 ## Steps:
@@ -128,5 +128,5 @@ perl -pe 's/},]/}]/;s/COMMIT_HASH_(\w+)/`echo"";getcommit $1`/e' &> ../files.txt
 ....
 
 ```
-* run python file to concatenate two files. 
+* run "concatenate_two_files_into_one_dataset.ipynb" to concatenate two files. 
 
