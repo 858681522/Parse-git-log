@@ -3,9 +3,8 @@ Aim: parse git log into structured datasets and json files.
 
 ## Steps:
 
-* （1）run bash file ”download_gitlog_in_bash".
 For example, we are interested in GitHub project: "talon-twitter-holo". https://github.com/klinker24/talon-twitter-holo
-
+* 1. open gitHub project in bash ,run "download_gitlog_in_bash".
 ```
 echo commit,author_name,time_sec,message,files_changed,lines_inserted,lines_deleted>../logfiles.csv; # specify save path 
 git log  --oneline --pretty="_Z_Z_Z_%h_Y_Y_\"%an\"_Y_Y_%at_Y_Y_\"%<(79,trunc)%f\"_Y_Y__X_X_"  --stat    \
@@ -22,11 +21,11 @@ git log  --oneline --pretty="_Z_Z_Z_%h_Y_Y_\"%an\"_Y_Y_%at_Y_Y_\"%<(79,trunc)%f\
     | sed -E 's/,changed/,/' \
     | sed -E 's/files? ,/,/g'  \
     | sed -E 's/_X_X_ $/,,/g'  \
-    | sed -E 's/_X_X_//g'>>../turn_log_into_dataset/data/${GROUP_PROJECT}/${PROJECT_NAME}_logfiles.csv 
+    | sed -E 's/_X_X_//g'>>../logfiles.csv  # specify save path 
 
 ```
 
-### Output
+### Output : .csv file
 ```
 commit,     author_name,    time_sec,     message,                                                               files_changed,lines_inserted,lines_deleted
 f1ca916, "Luke Klinker", 1530723223, "fix-login-issue                                                             ",    3 ,11 , 4  
@@ -43,9 +42,91 @@ c1e7855, "Luke Klinker", 1513779855, "New-Save-tweets-for-later                 
 c087bd0, "Luke Klinker", 1510150517, "fix-build                                                                   ",    2 , 1 , 10  
 f70300d, "Luke Klinker", 1510150280, "update-some-dependencies-and-version-number                                 ",    2 , 9 , 9  
 
+...
 ```
+* 2. download files name in each commit
+```
+function getcommit { \
+    git show --pretty="format:"  --name-only $1 | \
+    perl -pe's/^\n//g;' | \
+    sed 's/\(.*\)/"\1"/g' | \
+    perl -0pe 's/\n(?!\Z)/,\n/g'; \
+}
 
+export -f getcommit
 
+git log --pretty=format:'{%n  "commit": "%h",%n  "files": [ COMMIT_HASH_%H  ]%n},' | \
+perl -pe 'BEGIN{print "["}; END{print "]\n"}' | \
+perl -pe 's/},]/}]/;s/COMMIT_HASH_(\w+)/`echo"";getcommit $1`/e' &> ../files.txt # specify save path 
 
-* （2）run python file to concatenate two files. 
+```
+### Output: json format .txt file
+```
+[{
+  "commit": "f1ca916",
+  "files": [ 
+"app/src/main/java/com/klinker/android/twitter/activities/setup/LoginActivity.java",
+"app/src/main/res/xml/changelog.xml",
+"gradle.properties"
+  ]
+},
+{
+  "commit": "da050cb",
+  "files": [ 
+"README.md"
+  ]
+},
+{
+  "commit": "e7b9dc7",
+  "files": [ 
+"app/src/main/res/values-ar/strings.xml",
+"app/src/main/res/values-da/strings.xml",
+"app/src/main/res/values-de/strings.xml",
+"app/src/main/res/values-hu/strings.xml",
+"app/src/main/res/values-it/strings.xml",
+"app/src/main/res/values-nb/strings.xml",
+"app/src/main/res/values-tr/strings.xml"
+  ]
+},
+{
+  "commit": "2e7158b",
+  "files": [ 
+"app/src/main/res/values-da/strings.xml",
+"app/src/main/res/values-de/strings.xml",
+"app/src/main/res/values-es/strings.xml",
+"app/src/main/res/values-hu/strings.xml",
+"app/src/main/res/values-nb/strings.xml",
+"app/src/main/res/values-pt-rBR/strings.xml"
+  ]
+},
+{
+  "commit": "9e5ff49",
+  "files": [ 
+  ]
+},
+{
+  "commit": "2616ec3",
+  "files": [ 
+"app/src/main/java/com/klinker/android/twitter/activities/compose/Compose.java",
+"app/src/main/java/com/klinker/android/twitter/activities/photo_viewer/PhotoFragment.java",
+"app/src/main/java/com/klinker/android/twitter/activities/photo_viewer/PhotoViewerActivity.java",
+"app/src/main/java/com/klinker/android/twitter/activities/tweet_viewer/TweetPager.java",
+"app/src/main/java/com/klinker/android/twitter/activities/tweet_viewer/fragments/VideoFragment.java",
+"app/src/main/java/com/klinker/android/twitter/data/App.java",
+"app/src/main/java/com/klinker/android/twitter/services/SendQueue.java",
+"app/src/main/java/com/klinker/android/twitter/services/SendScheduledTweet.java",
+"app/src/main/java/com/klinker/android/twitter/services/SendTweet.java",
+"app/src/main/java/com/klinker/android/twitter/services/TalonPullNotificationService.java",
+"app/src/main/java/com/klinker/android/twitter/services/TrimDataService.java",
+"app/src/main/java/com/klinker/android/twitter/services/WidgetRefreshService.java",
+"app/src/main/java/com/klinker/android/twitter/settings/AppSettings.java",
+"app/src/main/java/com/klinker/android/twitter/utils/ActivityUtils.java",
+"app/src/main/java/com/klinker/android/twitter/utils/NotificationUtils.java"
+  ]
+},
+
+....
+
+```
+* run python file to concatenate two files. 
 
