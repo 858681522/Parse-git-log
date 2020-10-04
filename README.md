@@ -128,5 +128,5 @@ perl -pe 's/},]/}]/;s/COMMIT_HASH_(\w+)/`echo"";getcommit $1`/e' &> ../files.txt
 ....
 
 ```
-* run "concatenate_two_files_into_one_dataset.ipynb" to concatenate two files. 
+* 3. run "concatenate_two_files_into_one_dataset.ipynb" to concatenate two files. 
 
