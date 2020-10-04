@@ -1,2 +1,8 @@
 # Parse-git-log
-Parse git log into structured dataset
+Aim: Parse git log into structured datasets and json files.
+
+## Steps:
+‘’‘
+（1） run bash file.
+ (2) run python file to concatenate two files. 
+
