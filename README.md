@@ -6,7 +6,7 @@ Aim: parse git log into structured datasets and json files.
 For example, we are interested in GitHub project: "talon-twitter-holo". https://github.com/klinker24/talon-twitter-holo
 * 1. open gitHub project in bash ,run "download_gitlog_in_bash".
 ```
-echo commit,author_name,time_sec,message,files_changed,lines_inserted,lines_deleted>../logfiles.csv; # specify save path 
+echo commit,author_name,time_sec,message,files_changed,lines_inserted,lines_deleted>../talon-twitter-holo_logfiles.csv; # specify save path 
 git log  --oneline --pretty="_Z_Z_Z_%h_Y_Y_\"%an\"_Y_Y_%at_Y_Y_\"%<(79,trunc)%f\"_Y_Y__X_X_"  --stat    \
     | grep -v \| \
     | sed -E 's/@//g' \
@@ -21,7 +21,7 @@ git log  --oneline --pretty="_Z_Z_Z_%h_Y_Y_\"%an\"_Y_Y_%at_Y_Y_\"%<(79,trunc)%f\
     | sed -E 's/,changed/,/' \
     | sed -E 's/files? ,/,/g'  \
     | sed -E 's/_X_X_ $/,,/g'  \
-    | sed -E 's/_X_X_//g'>>../logfiles.csv  # specify save path 
+    | sed -E 's/_X_X_//g'>>../talon-twitter-holo_logfiles.csv  # specify save path 
 
 ```
 
@@ -57,7 +57,7 @@ export -f getcommit
 
 git log --pretty=format:'{%n  "commit": "%h",%n  "files": [ COMMIT_HASH_%H  ]%n},' | \
 perl -pe 'BEGIN{print "["}; END{print "]\n"}' | \
-perl -pe 's/},]/}]/;s/COMMIT_HASH_(\w+)/`echo"";getcommit $1`/e' &> ../files.txt # specify save path 
+perl -pe 's/},]/}]/;s/COMMIT_HASH_(\w+)/`echo"";getcommit $1`/e' &> ../talon-twitter-holo_files.txt # specify save path 
 
 ```
 ### Output: json format .txt file
